@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 const navigation = [
   ["Quick start", "/getting-started"],
   ["Core loop", "/core-loop"],
@@ -11,10 +9,12 @@ const navigation = [
 export function SiteHeader() {
   return (
     <header className="site-header">
-      <Link className="brand" href="/" aria-label="Greedy Growers Guide home">
+      {/* Static export: plain anchors force full-page navigation without RSC endpoints. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a className="brand" href="/" aria-label="Greedy Growers Guide home">
         <span aria-hidden="true">G</span>
         Greedy Growers Guide
-      </Link>
+      </a>
       <nav aria-label="Primary navigation">
         {navigation.map(([label, href]) => <a href={href} key={href}>{label}</a>)}
       </nav>
@@ -28,10 +28,12 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="footer-grid">
         <div>
-          <Link className="brand footer-brand" href="/">
+          {/* Static export: plain anchors force full-page navigation without RSC endpoints. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a className="brand footer-brand" href="/">
             <span aria-hidden="true">G</span>
             Greedy Growers Guide
-          </Link>
+          </a>
           <p>An independent, source-labelled learning guide. Not affiliated with Roblox or Banjo Lady Games.</p>
         </div>
         <div className="footer-links">

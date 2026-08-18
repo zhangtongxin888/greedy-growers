@@ -4,7 +4,7 @@ Independent, source-labelled beginner guide for Greedy Growers on Roblox.
 
 - Production domain: `https://greedy-growers-guide.wiki`
 - Framework: vinext + React
-- Hosting target: Cloudflare Workers
+- Production hosting: Vercel static deployment
 - Long-term source: this repository only
 
 ## Local checks
@@ -15,6 +15,7 @@ npm run lint
 npm run typecheck
 npm test
 npm run deploy:dry-run
+npm run build:vercel
 ```
 
 The guide intentionally avoids unverified lightning odds, growth timers, profit formulas, and other exact values that are not published by the game creator.
