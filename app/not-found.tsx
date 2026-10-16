@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AdsterraArticleBottom, AdsterraArticleMid, AdsterraArticleTop } from "@/components/ads";
 import { SiteFooter, SiteHeader } from "./components/SiteChrome";
 
 export const metadata: Metadata = {
@@ -14,11 +15,14 @@ export default function NotFound() {
   return (
     <>
       <SiteHeader />
+      <AdsterraArticleTop />
       <main className="not-found">
         <p className="eyebrow">404 · Route missing</p>
         <h1>This plot is empty.</h1>
         <p>The page you followed is not part of the current guide. Return to the beginner route and keep your next harvest moving.</p>
         <a className="button button-primary" href="/getting-started">Start the beginner route</a>
+        <AdsterraArticleMid />
+        <AdsterraArticleBottom />
       </main>
       <SiteFooter />
     </>

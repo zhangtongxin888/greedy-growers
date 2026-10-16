@@ -1,3 +1,4 @@
+import { AdsterraArticleBottom, AdsterraArticleMid, AdsterraArticleTop } from "@/components/ads";
 import { EvidenceNote } from "./components/GuideLayout";
 import { SiteFooter, SiteHeader } from "./components/SiteChrome";
 
@@ -49,6 +50,8 @@ export default function Home() {
             <p className="route-note">The goal is one complete loop—not the tallest possible first tree.</p>
           </aside>
         </section>
+
+        <AdsterraArticleTop />
 
         <section className="section quick-start" id="quick-start">
           <div className="section-heading">
@@ -111,6 +114,8 @@ export default function Home() {
           <a className="button button-primary" href="/getting-started">Begin the guided route</a>
           <a className="source-link" href="/sources">Review the evidence behind this guide</a>
         </section>
+        <AdsterraArticleMid />
+        <AdsterraArticleBottom />
       </main>
       <SiteFooter />
     </>

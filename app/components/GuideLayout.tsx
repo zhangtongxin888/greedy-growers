@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { AdsterraArticleBottom, AdsterraArticleMid, AdsterraArticleTop } from "@/components/ads";
 import { SiteFooter, SiteHeader } from "./SiteChrome";
 
 type GuideLink = { href: string; label: string };
@@ -41,6 +42,7 @@ export function GuideLayout({
   return (
     <>
       <SiteHeader />
+      <AdsterraArticleTop />
       <main className="guide-main">
         <div className="breadcrumbs"><Link href="/">Home</Link><span>/</span><span>{eyebrow}</span></div>
         <header className="guide-hero">
@@ -56,10 +58,12 @@ export function GuideLayout({
           </aside>
           <article className="guide-article">{children}</article>
         </div>
+        <AdsterraArticleMid />
         <nav className="chapter-nav" aria-label="Guide chapters">
           {previous ? <a className="chapter-previous" href={previous.href}><span>Previous</span><strong>← {previous.label}</strong></a> : <span />}
           {next ? <a className="chapter-next" href={next.href}><span>Continue</span><strong>{next.label} →</strong></a> : <span />}
         </nav>
+        <AdsterraArticleBottom />
       </main>
       <SiteFooter />
     </>
