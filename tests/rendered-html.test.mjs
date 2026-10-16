@@ -102,10 +102,57 @@ test("robots and sitemap expose exactly the canonical public route set", async (
   }
 });
 
+const contentSecurityPolicy = "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: blob:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss: blob:; frame-src https: blob: data:; child-src https: blob: data:; worker-src 'self' blob: https:; media-src 'self' data: blob: https:";
+
+function cspSources(policy, name) {
+  const directive = policy
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part === name || part.startsWith(`${name} `));
+  assert.ok(directive, `missing ${name}`);
+  return directive.slice(name.length).trim().split(/\s+/).filter(Boolean);
+}
+
 test("production responses include the expected security policy", async () => {
   const response = await render("/");
-  assert.match(response.headers.get("content-security-policy") ?? "", /default-src 'self'/);
-  assert.match(response.headers.get("content-security-policy") ?? "", /frame-ancestors 'none'/);
+  const policy = response.headers.get("content-security-policy") ?? "";
+  assert.equal(policy, contentSecurityPolicy);
+  assert.deepEqual(cspSources(policy, "default-src"), ["'self'"]);
+  for (const name of ["script-src", "frame-src", "img-src", "connect-src"]) {
+    assert.ok(cspSources(policy, name).includes("https:"), `${name} must allow https:`);
+  }
+  for (const source of ["blob:", "data:"]) {
+    assert.ok(cspSources(policy, "frame-src").includes(source), `frame-src must allow ${source}`);
+  }
+  for (const source of ["wss:", "blob:"]) {
+    assert.ok(cspSources(policy, "connect-src").includes(source), `connect-src must allow ${source}`);
+  }
+  assert.ok(cspSources(policy, "script-src").includes("blob:"));
+  assert.ok(cspSources(policy, "media-src").includes("blob:"));
+  assert.ok(cspSources(policy, "worker-src").includes("https:"));
+  assert.ok(cspSources(policy, "child-src").includes("data:"));
+  assert.equal(
+    cspSources(policy, "script-src").some((source) =>
+      ["'strict-dynamic'", "'nonce-", "'sha256-", "'sha384-", "'sha512-"].some((marker) => source.startsWith(marker)),
+    ),
+    false,
+  );
+  for (const name of ["script-src", "style-src", "img-src", "font-src", "connect-src", "frame-src", "child-src", "worker-src", "media-src"]) {
+    for (const source of cspSources(policy, name)) {
+      assert.doesNotMatch(source, /:\/\/|^\*\./, `${name} must not allowlist hosts (${source})`);
+    }
+  }
+
+  const vercel = JSON.parse(await readFile(new URL("../vercel.json", import.meta.url), "utf8"));
+  const vercelPolicy = vercel.headers
+    .flatMap((group) => group.headers ?? [])
+    .find((header) => header.key === "Content-Security-Policy");
+  assert.equal(vercelPolicy?.value, contentSecurityPolicy);
+
+  const adConfig = await readFile(new URL("../lib/adsterra.generated.ts", import.meta.url), "utf8");
+  assert.match(adConfig, /adsterraEnablePopunder:\s*false/);
+  assert.match(adConfig, /adsterraEnableSocialBar:\s*false/);
+
   assert.equal(response.headers.get("x-frame-options"), "DENY");
   assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
 });
