@@ -152,9 +152,41 @@ test("production responses include the expected security policy", async () => {
   const adConfig = await readFile(new URL("../lib/adsterra.generated.ts", import.meta.url), "utf8");
   assert.match(adConfig, /adsterraEnablePopunder:\s*false/);
   assert.match(adConfig, /adsterraEnableSocialBar:\s*false/);
+  assert.match(adConfig, /adsterraEnableStickyRail:\s*false/);
 
   assert.equal(response.headers.get("x-frame-options"), "DENY");
   assert.equal(response.headers.get("referrer-policy"), "strict-origin-when-cross-origin");
+});
+
+function adPlacements(html) {
+  return [...html.matchAll(/class="ad-placement ad-placement-(top|mid|bottom)"/g)].map((match) => match[1]);
+}
+
+test("content pages show one early banner plus native and rectangle, and legal pages stay empty", async () => {
+  const home = await (await render("/")).text();
+  const homePlacements = adPlacements(home);
+  assert.deepEqual(homePlacements, ["top", "mid", "bottom"]);
+  const hero = home.indexOf("Grow your first tree.");
+  const top = home.indexOf('class="ad-placement ad-placement-top"');
+  const quickStart = home.indexOf('id="quick-start"');
+  assert.ok(hero !== -1 && hero < top && top < quickStart, "homepage banner sits after the hero");
+  assert.ok(top < home.indexOf('class="ad-placement ad-placement-mid"'));
+  assert.doesNotMatch(home, /ad-placement-global-fallback|ad-sticky-rail|id="adsterra-popunder"|id="adsterra-social-bar"/);
+
+  const guide = await (await render("/getting-started")).text();
+  assert.deepEqual(adPlacements(guide), ["top", "mid", "bottom"]);
+  const header = guide.indexOf('class="site-header"');
+  const guideTop = guide.indexOf('class="ad-placement ad-placement-top"');
+  const guideMain = guide.indexOf('class="guide-main"');
+  assert.ok(header !== -1 && header < guideTop && guideTop < guideMain, "guide banner sits after the header");
+
+  const sources = await (await render("/sources")).text();
+  assert.deepEqual(adPlacements(sources), []);
+  assert.doesNotMatch(sources, /class="ad-shell|ad-sticky-rail|id="adsterra-popunder"|id="adsterra-social-bar"/);
+
+  const missing = await (await render("/not-a-real-guide")).text();
+  assert.deepEqual(adPlacements(missing), ["top", "mid", "bottom"]);
+  assert.ok(missing.indexOf('class="site-header"') < missing.indexOf('class="ad-placement ad-placement-top"'));
 });
 
 test("unknown routes return a clean noindex page without a homepage canonical", async () => {
