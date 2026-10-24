@@ -16,7 +16,7 @@ export default function NotFound() {
     <>
       <SiteHeader />
       <AdsterraArticleTop />
-      <main className="not-found">
+      <main data-adsterra-clean="" className="not-found">
         <p className="eyebrow">404 · Route missing</p>
         <h1>This plot is empty.</h1>
         <p>The page you followed is not part of the current guide. Return to the beginner route and keep your next harvest moving.</p>
