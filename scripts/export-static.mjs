@@ -31,6 +31,7 @@ await rm(outputRoot, { recursive: true, force: true });
 await mkdir(outputRoot, { recursive: true });
 await cp(path.join(projectRoot, "dist", "client", "_next"), path.join(outputRoot, "_next"), { recursive: true });
 await cp(path.join(projectRoot, "dist", "client", "og.png"), path.join(outputRoot, "og.png"));
+await cp(path.join(projectRoot, "dist", "client", "adsterra"), path.join(outputRoot, "adsterra"), { recursive: true });
 
 for (const route of htmlRoutes) {
   const destination = route === "/" ? "index.html" : `${route.slice(1)}.html`;
